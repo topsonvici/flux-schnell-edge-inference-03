@@ -84,9 +84,17 @@ def infer_latents(prompt_embeds, pooled_prompt_embeds, width: int | None, height
         output_type="latent",
     ).images
 
+vae = AutoencoderKL.from_pretrained(
+    CHECKPOINT,
+    subfolder="vae",
+    torch_dtype=torch.bfloat16,
+).to("cuda")
+
+vae_scale_factor = 2 ** (len(vae.config.block_out_channels))
+image_processor = VaeImageProcessor(vae_scale_factor=vae_scale_factor)
 
 def infer(request: TextToImageRequest, _pipeline: Pipeline) -> Image:
-    empty_cache()
+    # empty_cache()
 
     prompt_embeds, pooled_prompt_embeds, text_ids = encode_prompt(request.prompt)
 
@@ -94,16 +102,7 @@ def infer(request: TextToImageRequest, _pipeline: Pipeline) -> Image:
 
     latents = infer_latents(prompt_embeds, pooled_prompt_embeds, request.width, request.height, request.seed)
 
-    empty_cache()
-
-    vae = AutoencoderKL.from_pretrained(
-        CHECKPOINT,
-        subfolder="vae",
-        torch_dtype=torch.bfloat16,
-    ).to("cuda")
-
-    vae_scale_factor = 2 ** (len(vae.config.block_out_channels))
-    image_processor = VaeImageProcessor(vae_scale_factor=vae_scale_factor)
+    # empty_cache()
 
     height = request.height or 64 * vae_scale_factor
     width = request.width or 64 * vae_scale_factor
