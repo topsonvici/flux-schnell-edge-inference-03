@@ -42,7 +42,7 @@ def load_pipeline() -> Pipeline:
     pipeline.text_encoder_2 = pipeline.text_encoder_2.to("cuda")
     # quantize_(pipeline.text_encoder_2, int8_weight_only())
 
-    pipeline.vae = AutoencoderTiny.from_pretrained("madebyollin/taef1", torch_dtype=torch.bfloat16)
+    # pipeline.vae = AutoencoderTiny.from_pretrained("madebyollin/taef1", torch_dtype=torch.bfloat16)
     pipeline.vae = pipeline.vae.to("cuda")
     # quantize_(pipeline.vae, int8_weight_only())
     
